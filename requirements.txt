@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pymongo
+python-multipart
+pdfminer.six
+scikit-learn
+nltk
+tqdm
