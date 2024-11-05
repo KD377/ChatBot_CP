@@ -1,4 +1,5 @@
 import os
+import fitz
 from pymongo import MongoClient
 
 
@@ -51,27 +52,19 @@ class MongoDBHandler:
     def search_documents_by_text(self, search_text):
         return list(self.collection.find({'$text': {'$search': search_text}}))
 
-if __name__ == "__main__":
-    handler = MongoDBHandler()
 
-    # Get all documents
-    documents = handler.get_all_documents()
+    # Pobiera plik PDF jako dane binarne z bazy danych i zwraca jego zawartość tekstową.
+    def get_text_from_binary_pdf(self, file_name):
+        document = self.collection.find_one({'file_name': file_name}, {'file_data': 1})
+        if not document or 'file_data' not in document:
+            print("Dokument nie został znaleziony lub nie zawiera danych pliku.")
+            return None
 
-    # Get a document by file name
-    document = handler.get_document_by_file_name('example.pdf')
+        pdf_data = document['file_data']
+        text = ""
+        with fitz.open(stream=pdf_data, filetype="pdf") as doc:
+            for page in doc:
+                text += page.get_text()
 
-    # Get documents by keyword
-    documents = handler.get_documents_by_keyword('ustawa')
+        return text
 
-    # Save PDF from database
-    handler.save_pdf_from_database('example.pdf', './retrieved_pdfs')
-
-    # Update document keywords
-    handler.update_document_keywords('example.pdf', ['nowe', 'słowa', 'kluczowe'])
-
-    # Delete a document
-    handler.delete_document('example.pdf')
-
-    # Create text index and search
-    handler.create_text_index()
-    documents = handler.search_documents_by_text('prawo')
