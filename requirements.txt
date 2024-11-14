@@ -1,8 +1,12 @@
 fastapi
 uvicorn[standard]
-pymongo
+pymongo~=4.10.1
 python-multipart
 pdfminer.six
 scikit-learn
 nltk
 tqdm
+
+requests~=2.32.3
+fitz~=0.0.1.dev2
+keybert~=0.8.5
