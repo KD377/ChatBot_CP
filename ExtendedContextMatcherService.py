@@ -2,7 +2,7 @@ from ContextMatcherService import ContextMatcherService
 from MongoDBHandler import MongoDBHandler
 
 
-class ExtendedMongoDBHandler(MongoDBHandler, ContextMatcherService):
+class ExtendedContextMatcherService(MongoDBHandler, ContextMatcherService):
 
     def __init__(self):
         super().__init__()
@@ -12,7 +12,7 @@ class ExtendedMongoDBHandler(MongoDBHandler, ContextMatcherService):
 
 
 def main():
-    db_handler = ExtendedMongoDBHandler()
+    db_handler = ExtendedContextMatcherService()
 
     legal_field_value = "prawo finansowe"
     file_names = db_handler.create_matching_context(legal_field_value)

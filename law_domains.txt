@@ -1,5 +1,7 @@
-Prawo cywilne
-Prawo karne
-Prawo gospodarcze
-Prawo pracy
-Prawo podatkowe
+prawo cywilne
+prawo karne
+prawo administracyjne
+prawo pracy
+prawo handlowe
+prawo finansowe
+prawo konstytucyjne
