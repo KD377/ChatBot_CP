@@ -15,8 +15,6 @@ class MongoDBHandler:
     def get_document_by_file_name(self, file_name):
         return self.collection.find_one({'file_name': file_name})
 
-    def get_documents_by_keyword(self, keyword):
-        return list(self.collection.find({'keywords': keyword}))
 
     def save_pdf_from_database(self, file_name, output_dir):
         document = self.collection.find_one({'file_name': file_name})
@@ -29,15 +27,6 @@ class MongoDBHandler:
         else:
             print("Document not found or does not contain file data.")
 
-    def update_document_keywords(self, file_name, new_keywords):
-        result = self.collection.update_one(
-            {'file_name': file_name},
-            {'$set': {'keywords': new_keywords}}
-        )
-        if result.modified_count > 0:
-            print("Keywords updated successfully.")
-        else:
-            print("Document not found or keywords already up to date.")
 
     def delete_document(self, file_name):
         result = self.collection.delete_one({'file_name': file_name})
@@ -45,13 +34,6 @@ class MongoDBHandler:
             print("Document deleted successfully.")
         else:
             print("Document not found.")
-
-    def create_text_index(self):
-        self.collection.create_index([('keywords', 'text')])
-
-    def search_documents_by_text(self, search_text):
-        return list(self.collection.find({'$text': {'$search': search_text}}))
-
 
     # Pobiera plik PDF jako dane binarne z bazy danych i zwraca jego zawartość tekstową.
     def get_text_from_binary_pdf(self, file_name):
@@ -68,3 +50,7 @@ class MongoDBHandler:
 
         return text
 
+    def get_files_by_legal_field(self, legal_field_value):
+        documents = self.collection.find({'legal_field': legal_field_value}, {'file_name': 1})
+        file_names = [doc['file_name'] for doc in documents]
+        return file_names
