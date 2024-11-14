@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt
 from typing import List, Optional
 from GenerateResponseService import LanguageModelService
 from dotenv import load_dotenv
@@ -14,7 +14,7 @@ model = LanguageModelService()
 
 
 class YearsRequest(BaseModel):
-    years: List[int]
+    years: List[StrictInt]
 
 
 class QuestionRequest(BaseModel):
@@ -26,6 +26,7 @@ class AnswerResponse(BaseModel):
 
 
 selected_years: Optional[List[int]] = [1918, 2024]
+restricted_years = {1940, 1941, 1942, 1943}
 
 
 @app.post("/set_years")
@@ -38,9 +39,10 @@ async def set_years(request: YearsRequest):
     for year in request.years:
         if not isinstance(year, int):
             raise HTTPException(status_code=400, detail="Lata muszą być liczbami całkowitymi.")
+        if year in restricted_years:
+            raise HTTPException(status_code=400, detail="Lata 1940, 1941, 1942, 1943 są niedostępne.")
 
     selected_years = request.years
-
     return {"message": "Zakres lat został ustawiony.", "years": selected_years}
 
 
