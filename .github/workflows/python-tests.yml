@@ -33,6 +33,6 @@ jobs:
 
     - name: Run tests
       run: |
-        . venv/bin/activate  # Activate the virtual environment (if not already activated)
-        pip install pytest  # Ensure pytest is installed
-        pytest --maxfail=1 --disable-warnings -q  # Run tests and stop after the first failure, hide warnings, and use quiet mode
+        . venv/bin/activate
+        pip install pytest httpx vertexai
+        pytest APITest.py --maxfail=1 
