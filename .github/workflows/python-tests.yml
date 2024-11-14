@@ -1,0 +1,38 @@
+name: Python Tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      CHARACTER_LIMIT: 2000
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv  # Create a virtual environment
+        . venv/bin/activate  # Activate the virtual environment
+        pip install --upgrade pip  # Upgrade pip
+        pip install -r requirements.txt  # Install dependencies from your requirements file
+
+    - name: Run tests
+      run: |
+        . venv/bin/activate  # Activate the virtual environment (if not already activated)
+        pip install pytest  # Ensure pytest is installed
+        pytest --maxfail=1 --disable-warnings -q  # Run tests and stop after the first failure, hide warnings, and use quiet mode
