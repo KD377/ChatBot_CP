@@ -99,3 +99,48 @@ def test_ask_question_internal_server_error(mock_get_model_response):
     assert response.json()["detail"] == "Wewnętrzny błąd serwera"
 
     mock_get_model_response.assert_called_once_with(question)
+
+
+def test_set_years_valid_request():
+    response = client.post("/set_years", json={"years": [2020, 2021, 2022]})
+
+    assert response.status_code == 200
+
+    assert response.json() == {
+        "message": "Zakres lat został ustawiony.",
+        "years": [2020, 2021, 2022]
+    }
+
+
+def test_set_years_empty_list():
+    response = client.post("/set_years", json={"years": []})
+
+    assert response.status_code == 400
+
+    assert response.json()["detail"] == "Nieprawidłowy format 'years'."
+
+
+def test_set_years_not_a_list():
+    response = client.post("/set_years", json={"years": "2020"})
+
+    assert response.status_code == 422
+    assert response.json() is not None
+
+
+def test_set_years_with_string():
+    response = client.post("/set_years", json={"years": [2020, "2021", 2022]})
+    assert response.status_code == 422
+
+
+def test_set_years_contains_restricted_year():
+    response = client.post("/set_years", json={"years": [2020, 1940, 2022]})
+
+    assert response.status_code == 400
+
+    assert response.json()["detail"] == "Lata 1940, 1941, 1942, 1943 są niedostępne."
+
+
+def test_set_years_missing_years_key():
+    response = client.post("/set_years", json={})
+
+    assert response.status_code == 422
