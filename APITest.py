@@ -5,9 +5,11 @@ from main import app
 
 client = TestClient(app)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def setup_and_teardown():
     yield
+
 
 @patch('main.LanguageModelService.get_model_response')
 def test_valid_question(mock_get_model_response):
@@ -43,6 +45,7 @@ def test_empty_string_question_provided(mock_get_model_response):
     assert response.json()["detail"] == "Nieprawidłowy format 'question'."
 
     mock_get_model_response.assert_not_called()
+
 
 @patch('main.LanguageModelService.get_model_response')
 def test_unprocessable_entity(mock_get_model_response):

@@ -1,7 +1,6 @@
 import vertexai
 from vertexai.generative_models import GenerativeModel
 from ContextMatcherService import MockContextMatcherService
-import os
 
 
 class LanguageModelService:
@@ -11,7 +10,7 @@ class LanguageModelService:
 
         self.law_domains = self._read_law_domains("law_domains.txt")
 
-        self.context_matcher = MockContextMatcherService() #TODO: change for real implementation
+        self.context_matcher = MockContextMatcherService()  #TODO: change for real implementation
 
     def _read_law_domains(self, filepath):
         """Read the list of law domains from a text file."""

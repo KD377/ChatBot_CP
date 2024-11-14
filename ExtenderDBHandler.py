@@ -7,10 +7,8 @@ class ExtendedMongoDBHandler(MongoDBHandler, ContextMatcherService):
     def __init__(self):
         super().__init__()
 
-
     def create_matching_context(self, keywords):
         return self.get_files_by_legal_field(keywords)
-
 
 
 def main():

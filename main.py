@@ -16,19 +16,21 @@ model = LanguageModelService()
 class YearsRequest(BaseModel):
     years: List[int]
 
+
 class QuestionRequest(BaseModel):
     question: str
+
 
 class AnswerResponse(BaseModel):
     answer: str
 
-selected_years: Optional[List[int]] = [1918,2024]
+
+selected_years: Optional[List[int]] = [1918, 2024]
 
 
 @app.post("/set_years")
 async def set_years(request: YearsRequest):
     global selected_years
-
 
     if not request.years or not isinstance(request.years, list):
         raise HTTPException(status_code=400, detail="Nieprawidłowy format 'years'.")
@@ -44,7 +46,6 @@ async def set_years(request: YearsRequest):
 
 @app.post("/ask", response_model=AnswerResponse)
 async def ask_question(request: QuestionRequest):
-
     if not request.question or not isinstance(request.question, str) or request.question.strip() == "":
         raise HTTPException(status_code=400, detail="Nieprawidłowy format 'question'.")
 

@@ -6,6 +6,7 @@ from unidecode import unidecode
 from cleantext import clean
 import language_tool_python
 
+
 def find_pdf_files(root_dir):
     pdf_files = []
     for root, dirs, files in os.walk(root_dir):
@@ -14,12 +15,14 @@ def find_pdf_files(root_dir):
                 pdf_files.append(os.path.join(root, file))
     return pdf_files
 
+
 def extract_text_from_pdf(pdf_path):
     text = ""
     with fitz.open(pdf_path) as doc:
         for page in doc:
             text += page.get_text()
     return text
+
 
 def correct_text(text):
     text = clean(
@@ -42,6 +45,7 @@ def correct_text(text):
     matches = tool.check(text)
     corrected_text = language_tool_python.utils.correct(text, matches)
     return corrected_text
+
 
 # def extract_keywords(text, max_keywords=10):
 #     # Użyj alternatywnego modelu
@@ -74,6 +78,7 @@ def save_to_mongodb(collection, pdf_path, keywords):
     }
     collection.insert_one(document)
 
+
 def save_to_mongodb_binary(collection, pdf_path, legal_field):
     with open(pdf_path, 'rb') as f:
         import bson
@@ -105,13 +110,13 @@ def classify_legal_field(text, filepath='./legal_fields/key_words_legal_fields.j
             if keyword in text.lower():
                 field_counts[field] += 1
 
-
     max_field = max(field_counts, key=field_counts.get)
     if field_counts[max_field] == 0:
         return "Nieznana dziedzina prawa"
 
     print(field_counts)
     return max_field
+
 
 def main():
     root_dir = './dziennik_ustaw'
@@ -137,6 +142,7 @@ def main():
         # save_to_mongodb(collection, pdf_path, keywords)
         # lub
         save_to_mongodb_binary(collection, pdf_path, legal_field)
+
 
 if __name__ == "__main__":
     main()

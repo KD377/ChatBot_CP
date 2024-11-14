@@ -15,7 +15,6 @@ class MongoDBHandler:
     def get_document_by_file_name(self, file_name):
         return self.collection.find_one({'file_name': file_name})
 
-
     def save_pdf_from_database(self, file_name, output_dir):
         document = self.collection.find_one({'file_name': file_name})
         if document and 'file_data' in document:
@@ -26,7 +25,6 @@ class MongoDBHandler:
             print(f"File saved to {output_path}")
         else:
             print("Document not found or does not contain file data.")
-
 
     def delete_document(self, file_name):
         result = self.collection.delete_one({'file_name': file_name})
