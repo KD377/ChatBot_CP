@@ -1,0 +1,69 @@
+.ask-question {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ask-question h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ask-question textarea {
+  width: 95%;
+  height: 120px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  resize: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ask-question textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 4px rgba(52, 152, 219, 0.5);
+}
+
+.ask-question button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #e67e22;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ask-question button:hover {
+  background-color: #d35400;
+}
+
+.ask-question button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.ask-question p {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.ask-question .answer {
+  color: #27ae60;
+}
+
+.ask-question .error {
+  color: #e74c3c;
+}

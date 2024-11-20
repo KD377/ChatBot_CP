@@ -5,9 +5,19 @@ from pydantic import BaseModel, StrictInt
 from typing import List, Optional
 from GenerateResponseService import LanguageModelService
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 question_character_limit = int(os.getenv("CHARACTER_LIMIT", "500"))
 
 model = LanguageModelService()
