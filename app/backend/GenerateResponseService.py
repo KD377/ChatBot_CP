@@ -43,7 +43,7 @@ class LanguageModelService:
             raise Exception(f"Model returned an invalid law domain: {matched_domain}")
 
     def _read_pdf_contents(self, pdf_files):
-        from PyPDF2 import PdfReader
+        from PyPDF2 import PdfReader  # for mock purposes
 
         content = ""
         for pdf_file in pdf_files:

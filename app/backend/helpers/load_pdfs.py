@@ -3,7 +3,6 @@ import json
 import fitz
 from pymongo import MongoClient
 import bson
-from pymongo.errors import ConfigurationError
 
 def find_pdf_files(root_dir):
     pdf_files = []
