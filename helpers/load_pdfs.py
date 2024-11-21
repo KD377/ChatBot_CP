@@ -2,7 +2,6 @@ import os
 import json
 import fitz
 from pymongo import MongoClient
-from unidecode import unidecode
 from cleantext import clean
 import language_tool_python
 
@@ -25,25 +24,24 @@ def extract_text_from_pdf(pdf_path):
 
 
 def correct_text(text):
+    # Clean the text with supported arguments
     text = clean(
         text,
-        fix_unicode=True,
-        to_ascii=False,
-        lower=False,
-        no_line_breaks=False,
-        no_urls=True,
-        no_emails=True,
-        no_phone_numbers=True,
-        no_numbers=False,
-        no_digits=False,
-        no_currency_symbols=False,
-        no_punct=False,
-        replace_with_punct="",
-        lang="pl"
+        clean_all=False,  # Avoid over-cleaning; customize per your needs
+        extra_spaces=True,  # Remove extra spaces
+        stemming=False,  # Do not perform stemming
+        stopwords=False,  # Keep all stopwords
+        lowercase=False,  # Keep original casing
+        numbers=False,  # Remove numbers
+        punct=False,  # Keep punctuation
+        stp_lang='polish'  # Set the language for stopwords
     )
+
+    # Perform grammar correction using language_tool_python
     tool = language_tool_python.LanguageTool('pl-PL')
     matches = tool.check(text)
     corrected_text = language_tool_python.utils.correct(text, matches)
+
     return corrected_text
 
 

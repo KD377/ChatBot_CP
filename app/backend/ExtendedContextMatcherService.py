@@ -1,5 +1,5 @@
 from ContextMatcherService import ContextMatcherService
-from app.backend.MongoDBHandler import MongoDBHandler
+from MongoDBHandler import MongoDBHandler
 
 
 class ExtendedContextMatcherService(MongoDBHandler, ContextMatcherService):
