@@ -6,7 +6,11 @@ pdfminer.six
 scikit-learn
 nltk
 tqdm
-
+pytest
+httpx
+vertexai
+google-cloud-storage
+google-cloud-aiplatform
 requests~=2.32.3
 fitz~=0.0.1.dev2
 keybert~=0.8.5

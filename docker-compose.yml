@@ -1,7 +1,30 @@
-version: '3.8'
+version: "3.8"
+
 services:
-  mongodb:
-    image: mongo
+  backend:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/backend:/app/backend                # Mount backend code
+      - ./gcloud_key.json:/app/backend/gcloud_key.json  # Mount the Google Cloud key
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/backend/gcloud_key.json
+      - MONGO_URI=mongodb://mongo:27017/chatbot_db
+
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app/frontend:/app/frontend
+
+  mongo:
+    image: mongo:6.0
     container_name: mongodb
     ports:
       - "27017:27017"

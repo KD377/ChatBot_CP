@@ -162,6 +162,7 @@ cython_debug/
 .idea/
 
 data
+data/db
 dziennik_ustaw
 node_modules
 
