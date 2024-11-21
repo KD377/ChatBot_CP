@@ -165,4 +165,3 @@ data
 data/db
 dziennik_ustaw
 node_modules
-app/backend/gcloud_key.json
