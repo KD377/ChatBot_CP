@@ -8,11 +8,11 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./app/backend:/app/backend                # Mount backend code
-      - ./gcloud_key.json:/app/backend/gcloud_key.json  # Mount the Google Cloud key
+      - ./app/backend:/app/backend
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/backend/gcloud_key.json
       - MONGO_URI=mongodb://mongo:27017/chatbot_db
+
 
   frontend:
     build:

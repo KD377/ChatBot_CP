@@ -9,5 +9,4 @@ class ContextMatcherService(ABC):
 
 class MockContextMatcherService(ContextMatcherService):
     def create_matching_context(self, keywords):
-        return ["dziennik_ustaw/2010/D2010259176201.pdf", "dziennik_ustaw/2010/D2010259176301.pdf",
-                "dziennik_ustaw/2010/D2010259176401.pdf"]
+        return ["dziennik_ustaw/2010/D2010259176201.pdf"]
