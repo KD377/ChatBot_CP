@@ -6,7 +6,7 @@ import time
 BASE_URL = "https://dziennikustaw.gov.pl/DU/rok"
 BASE_URL_DIRECT = "https://dziennikustaw.gov.pl"
 AVAILABLE_YEARS = [str(year) for year in range(1918, 2025) if year not in {1943, 1942, 1941, 1940}]
-DOWNLOAD_DIR_BASE = "../dziennik_ustaw"
+DOWNLOAD_DIR_BASE = "../../../dziennik_ustaw"
 
 
 def prompt_user_for_years():

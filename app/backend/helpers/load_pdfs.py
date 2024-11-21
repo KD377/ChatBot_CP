@@ -117,7 +117,7 @@ def classify_legal_field(text, filepath='./legal_fields/key_words_legal_fields.j
 
 
 def main():
-    root_dir = '../dziennik_ustaw'
+    root_dir = '../../../dziennik_ustaw'
     pdf_files = find_pdf_files(root_dir)
     print(f"Znaleziono {len(pdf_files)} plików PDF.")
 
