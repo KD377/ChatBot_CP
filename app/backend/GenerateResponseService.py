@@ -1,7 +1,8 @@
 import vertexai
 from vertexai.generative_models import GenerativeModel
-# from ExtendedContextMatcherService import ExtendedContextMatcherService
 from ContextMatcherService import MockContextMatcherService
+import os
+
 
 class LanguageModelService:
     def __init__(self):
@@ -10,7 +11,7 @@ class LanguageModelService:
 
         self.law_domains = self._read_law_domains("law_domains.txt")
 
-        self.context_matcher = MockContextMatcherService()
+        self.context_matcher = MockContextMatcherService() #TODO: change for real implementation
 
     def _read_law_domains(self, filepath):
         """Read the list of law domains from a text file."""
@@ -34,12 +35,25 @@ class LanguageModelService:
         )
 
         response = self.model.generate_content(prompt)
-        matched_domain = response.text.strip()
+        matched_domain = response.text.strip().lower()
         # Validate the matched domain
         if matched_domain in self.law_domains:
             return matched_domain
         else:
             raise Exception(f"Model returned an invalid law domain: {matched_domain}")
+
+    def _read_pdf_contents(self, pdf_files):
+        from PyPDF2 import PdfReader
+
+        content = ""
+        for pdf_file in pdf_files:
+            try:
+                reader = PdfReader(pdf_file)
+                for page in reader.pages:
+                    content += page.extract_text()
+            except Exception as e:
+                print(f"Error reading {pdf_file}: {e}")
+        return content
 
     def get_model_response(self, question):
         """Main method to get the model's response to the user's question."""
@@ -52,12 +66,7 @@ class LanguageModelService:
             if not pdf_files:
                 raise Exception(f"No PDF files found for law domain: {law_domain}")
 
-            context = ""
-
-            for pdf_file in pdf_files:
-                text = self.context_matcher.get_text_from_binary_pdf(pdf_file)
-                if text:
-                    context += text
+            context = self._read_pdf_contents(pdf_files)
 
             final_prompt = (
                 f"You are a legal assistant specializing in {law_domain}.\n"

@@ -7,11 +7,13 @@ WORKDIR /app/backend
 # Add PYTHONPATH
 ENV PYTHONPATH=/app
 
-# Install dependencies
+# Copy only the requirements file first
 COPY requirements.txt .
+
+# Install dependencies
 RUN pip install -r requirements.txt
 
-# Copy backend source code
+# Copy the rest of the source code
 COPY . .
 
 # Expose the port for FastAPI
