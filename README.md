@@ -1,226 +1,128 @@
 # ChatBot_CP
 
+A chatbot application designed for legal document analysis and query handling, powered by Python (FastAPI backend) and React (frontend). This project integrates MongoDB for persistent storage and includes utilities for processing legal documents.
 
+---
 
-Thought for 31 seconds
+## Features
+- Process legal PDFs and extract key information.
+- Search and query legal domains interactively.
+- Frontend UI for user interaction.
+- FastAPI backend with modular services.
+- Integration with MongoDB for efficient data handling.
 
-W porządku! Poniżej przedstawiam kompletny kod źródłowy oraz pliki wymagane do realizacji Twojego projektu.
+---
 
-Struktura projektu
-css
-Copy code
+## Table of Contents
+1. [Requirements](#requirements)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Project Structure](#project-structure)
+6. [License](#license)
+
+---
+
+## Requirements
+
+Before you begin, ensure you have the following installed:
+- **Python 3.9 or later**
+- **Node.js** (for the React frontend)
+- **MongoDB** (local or cloud instance)
+- **Docker** (optional, for containerization)
+
+---
+
+## Installation
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/ChatBot_CP.git
+cd ChatBot_CP
+```
+
+### 2. Set Up the Backend
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use venv\Scripts\activate
+   ```
+3. Install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### 3. Set Up MongoDB
+1. Ensure MongoDB is running locally or set up a remote MongoDB connection.
+2. Modify the MongoDB connection URI in `backend/main.py` if needed.
+
+### 4. Process Legal Documents
+1. Place your legal PDFs in the `data` directory.
+2. Run the script to load them into MongoDB:
+   ```bash
+   python helpers/load_pdfs.py
+   ```
+
+### 5. Set Up the Frontend
+1. Navigate to the frontend directory:
+   ```bash
+   cd ../frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+---
+
+## Usage
+
+1. Start the backend server:
+   ```bash
+   cd backend
+   source venv/bin/activate
+   python main.py
+   ```
+   The FastAPI backend will be available at [http://localhost:8000](http://localhost:8000).
+
+2. Access the frontend:
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
+
+3. Interact with the chatbot to analyze and query legal documents.
+
+---
+
+## Project Structure
+```plaintext
 ChatBot_CP/
-├── app/
-│   ├── main.py
-│   ├── models.py
-│   ├── database.py
-│   └── utils.py
-├── dziennik_ustaw/
-│   └── [Twoje pliki PDF]
-├── docker-compose.yml
-├── requirements.txt
-├── scraper.py
-└── load_pdfs.py
-Plik requirements.txt
-plaintext
-Copy code
-fastapi
-uvicorn[standard]
-pymongo
-python-multipart
-pdfminer.six
-scikit-learn
-nltk
-tqdm
-Zainstaluj wymagane pakiety za pomocą polecenia:
+├── backend/                     # Backend (FastAPI)
+│   ├── ContextMatcherService.py
+│   ├── ExtendedContextMatcherService.py
+│   ├── GenerateResponseService.py
+│   ├── MongoDBHandler.py
+│   ├── main.py                  # Backend entry point
+│   ├── legal_fields/            # Legal domain data
+│   ├── tests/                   # Backend tests
+│   └── requirements.txt
+├── data/                        # Persistent data (MongoDB)
+├── frontend/                    # Frontend (React)
+│   ├── src/                     # React source files
+│   └── public/                  # React public assets
+├── helpers/                     # Helper scripts
+│   ├── load_pdfs.py             # PDF loader script
+│   └── scraper.py               # Data scraper script
+├── docker-compose.yml           # Docker configuration
+├── LICENSE                      # Project license
+└── README.md                    # Documentation
+```
 
-bash
-Copy code
-pip install -r requirements.txt
-Plik docker-compose.yml
-yaml
-Copy code
-version: '3.8'
-services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./data/db:/data/db
-Uruchom MongoDB za pomocą:
+## License
 
-bash
-Copy code
-docker-compose up -d
-Plik app/main.py
-python
-Copy code
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
-from app.database import get_collection
-from app.utils import preprocess_text
-from sklearn.feature_extraction.text import TfidfVectorizer
-import nltk
-
-nltk.download('punkt')
-
-app = FastAPI()
-
-class QueryModel(BaseModel):
-    keywords: str
-    limit: int = 5
-
-@app.get("/")
-def read_root():
-    return {"message": "Witaj w prawniczym czacie!"}
-
-@app.post("/search")
-def search_laws(query: QueryModel):
-    collection = get_collection()
-    all_docs = list(collection.find({}, {"_id": 0}))
-    if not all_docs:
-        raise HTTPException(status_code=404, detail="Brak dokumentów w bazie danych.")
-
-    documents = [doc['text'] for doc in all_docs]
-    titles = [doc['title'] for doc in all_docs]
-
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(documents)
-    query_vec = vectorizer.transform([query.keywords])
-
-    scores = (tfidf_matrix * query_vec.T).toarray()
-
-    results = sorted(
-        zip(titles, scores),
-        key=lambda x: x[1],
-        reverse=True
-    )
-
-    top_results = [{"title": title, "score": float(score)} for title, score in results[:query.limit]]
-    return {"results": top_results}
-Plik app/models.py
-python
-Copy code
-from pydantic import BaseModel
-
-class LawDocument(BaseModel):
-    title: str
-    text: str
-    metadata: dict
-Plik app/database.py
-python
-Copy code
-from pymongo import MongoClient
-
-def get_collection():
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['dziennik_ustaw']
-    collection = db['laws']
-    return collection
-Plik app/utils.py
-python
-Copy code
-import nltk
-from nltk.tokenize import word_tokenize
-
-def preprocess_text(text):
-    tokens = word_tokenize(text.lower())
-    return ' '.join(tokens)
-Skrypt load_pdfs.py do wczytywania plików PDF i zapisu do bazy danych
-python
-Copy code
-import os
-from pdfminer.high_level import extract_text
-from app.database import get_collection
-from app.utils import preprocess_text
-from tqdm import tqdm
-
-def process_pdfs(pdf_directory):
-    collection = get_collection()
-    for root, dirs, files in os.walk(pdf_directory):
-        for file in tqdm(files):
-            if file.endswith('.pdf'):
-                file_path = os.path.join(root, file)
-                try:
-                    text = extract_text(file_path)
-                    preprocessed_text = preprocess_text(text)
-                    title = file
-                    document = {
-                        "title": title,
-                        "text": preprocessed_text,
-                        "metadata": {}  # Możesz dodać tutaj dodatkowe metadane
-                    }
-                    collection.insert_one(document)
-                except Exception as e:
-                    print(f"Błąd przetwarzania pliku {file_path}: {e}")
-
-if __name__ == "__main__":
-    pdf_directory = './dziennik_ustaw'
-    process_pdfs(pdf_directory)
-Aktualizacja pliku scraper.py
-Jeśli chcesz kontynuować pobieranie plików PDF, możesz użyć swojego obecnego skryptu scraper.py. Upewnij się, że pliki PDF są zapisywane w katalogu dziennik_ustaw/, aby skrypt load_pdfs.py mógł je przetworzyć.
-
-Uruchomienie aplikacji FastAPI
-Aby uruchomić aplikację, wykonaj w terminalu:
-
-bash
-Copy code
-uvicorn app.main:app --reload
-Aplikacja będzie dostępna pod adresem http://127.0.0.1:8000
-
-Testowanie API
-Możesz przetestować API za pomocą narzędzia takiego jak curl lub Postman.
-
-Przykładowe zapytanie za pomocą curl:
-
-bash
-Copy code
-curl -X POST "http://127.0.0.1:8000/search" -H "Content-Type: application/json" -d '{"keywords": "kodeks cywilny", "limit": 5}'
-Przykładowe zapytanie w Postmanie:
-
-Metoda: POST
-URL: http://127.0.0.1:8000/search
-Body (JSON):
-json
-Copy code
-{
-  "keywords": "kodeks cywilny",
-  "limit": 5
-}
-Dodatkowe uwagi
-Biblioteka pdfminer.six jest używana do ekstrakcji tekstu z plików PDF.
-
-NLTK jest używane do tokenizacji tekstu. Upewnij się, że pobrałeś pakiet punktówacji:
-
-python
-Copy code
-import nltk
-nltk.download('punkt')
-TF-IDF jest używane do wyszukiwania najbardziej dopasowanych dokumentów do podanych słów kluczowych.
-
-tqdm dodaje pasek postępu podczas przetwarzania plików PDF.
-
-Baza danych MongoDB musi być uruchomiona przed wczytaniem plików PDF i uruchomieniem aplikacji FastAPI.
-
-Kroki do wykonania
-Uruchom MongoDB:
-
-bash
-Copy code
-docker-compose up -d
-Wczytaj pliki PDF do bazy danych:
-
-bash
-Copy code
-python load_pdfs.py
-Uruchom aplikację FastAPI:
-
-bash
-Copy code
-uvicorn app.main:app --reload
-Przetestuj API za pomocą curl lub Postmana.
-
-Jeśli napotkasz jakiekolwiek problemy lub masz dodatkowe pytania, daj znać! Chętnie pomogę w dalszych krokach.
+This project is licensed under the [MIT License](LICENSE).
