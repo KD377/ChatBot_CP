@@ -9,6 +9,7 @@ services:
       - "8000:8000"
     volumes:
       - ./app/backend:/app/backend
+      - ./dziennik_ustaw:/app/backend/dziennik_ustaw
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/backend/gcloud_key.json
       - MONGO_URI=mongodb://mongo:27017/chatbot_db

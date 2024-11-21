@@ -4,9 +4,22 @@ import fitz
 from pymongo import MongoClient
 from cleantext import clean
 import language_tool_python
+import nltk
+from nltk.corpus import stopwords
+
+# Download necessary NLTK data
+nltk.download('stopwords')
+
+# Manually define Polish stopwords (since NLTK lacks them)
+POLISH_STOPWORDS = {
+    "i", "oraz", "ponieważ", "ale", "że", "który", "tego", "mnie", "ją", "on", "ona",
+    "to", "się", "czy", "jest", "jak", "dla", "do", "z", "od", "po", "na", "za",
+    "bez", "by", "tym", "o", "przy", "jeśli"
+}
 
 
 def find_pdf_files(root_dir):
+    """Find all PDF files in the specified directory."""
     pdf_files = []
     for root, dirs, files in os.walk(root_dir):
         for file in files:
@@ -16,6 +29,7 @@ def find_pdf_files(root_dir):
 
 
 def extract_text_from_pdf(pdf_path):
+    """Extract text content from a PDF file."""
     text = ""
     with fitz.open(pdf_path) as doc:
         for page in doc:
@@ -24,52 +38,36 @@ def extract_text_from_pdf(pdf_path):
 
 
 def correct_text(text):
-    # Clean the text with supported arguments
+    """Clean and correct text using cleantext and LanguageTool."""
+    # Clean the text with cleantext
     text = clean(
         text,
-        clean_all=False,  # Avoid over-cleaning; customize per your needs
-        extra_spaces=True,  # Remove extra spaces
-        stemming=False,  # Do not perform stemming
-        stopwords=False,  # Keep all stopwords
-        lowercase=False,  # Keep original casing
-        numbers=False,  # Remove numbers
-        punct=False,  # Keep punctuation
-        stp_lang='polish'  # Set the language for stopwords
+        clean_all=False,
+        extra_spaces=True,
+        stemming=False,
+        stopwords=False,  # We handle stopwords manually
+        lowercase=False,
+        numbers=False,
+        punct=False,
+        reg='',
+        reg_replace='',
+        stp_lang=None  # Avoid default stopwords
     )
+
+    # Remove Polish stopwords manually
+    words = text.split()
+    filtered_text = " ".join(word for word in words if word.lower() not in POLISH_STOPWORDS)
 
     # Perform grammar correction using language_tool_python
     tool = language_tool_python.LanguageTool('pl-PL')
-    matches = tool.check(text)
-    corrected_text = language_tool_python.utils.correct(text, matches)
+    matches = tool.check(filtered_text)
+    corrected_text = language_tool_python.utils.correct(filtered_text, matches)
 
     return corrected_text
 
 
-# def extract_keywords(text, max_keywords=10):
-#     # Użyj alternatywnego modelu
-#     model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-#     kw_model = KeyBERT(model=model)
-#
-#     # Sprawdzenie długości tekstu
-#     if len(text.strip()) == 0:
-#         print("Brak tekstu do analizy")
-#         return []
-#
-#     # Generowanie słów kluczowych
-#     keywords = kw_model.extract_keywords(
-#         text,
-#         keyphrase_ngram_range=(1, 2),
-#         stop_words=None,
-#         top_n=max_keywords
-#     )
-#
-#     # Sprawdzenie wyniku
-#     if not keywords:
-#         print("Brak słów kluczowych")
-#
-#     return [kw[0] for kw in keywords]
-
 def save_to_mongodb(collection, pdf_path, keywords):
+    """Save metadata and keywords of a PDF to MongoDB."""
     document = {
         'file_path': pdf_path,
         'keywords': keywords
@@ -78,6 +76,7 @@ def save_to_mongodb(collection, pdf_path, keywords):
 
 
 def save_to_mongodb_binary(collection, pdf_path, legal_field):
+    """Save binary PDF data and legal field classification to MongoDB."""
     with open(pdf_path, 'rb') as f:
         import bson
         binary_data = bson.Binary(f.read())
@@ -90,8 +89,9 @@ def save_to_mongodb_binary(collection, pdf_path, legal_field):
 
 
 def load_legal_fields(filepath='./legal_fields/key_words_legal_fields.json'):
+    """Load legal fields and their keywords from a JSON file."""
     if not os.path.exists(filepath):
-        raise FileNotFoundError(f"Plik {filepath} nie istnieje.")
+        raise FileNotFoundError(f"File {filepath} does not exist.")
 
     with open(filepath, 'r', encoding='utf-8') as file:
         legal_fields = json.load(file)
@@ -99,8 +99,8 @@ def load_legal_fields(filepath='./legal_fields/key_words_legal_fields.json'):
 
 
 def classify_legal_field(text, filepath='./legal_fields/key_words_legal_fields.json'):
+    """Classify the legal field of the given text."""
     legal_fields = load_legal_fields(filepath)
-
     field_counts = {field: 0 for field in legal_fields}
 
     for field, keywords in legal_fields.items():
@@ -110,35 +110,35 @@ def classify_legal_field(text, filepath='./legal_fields/key_words_legal_fields.j
 
     max_field = max(field_counts, key=field_counts.get)
     if field_counts[max_field] == 0:
-        return "Nieznana dziedzina prawa"
+        return "Unknown Legal Field"
 
     print(field_counts)
     return max_field
 
 
 def main():
-    root_dir = '../../../dziennik_ustaw'
+    """Main function to process PDFs and save data to MongoDB."""
+    root_dir = './dziennik_ustaw'  # Adjusted to match container structure
     pdf_files = find_pdf_files(root_dir)
-    print(f"Znaleziono {len(pdf_files)} plików PDF.")
 
-    # Połączenie z MongoDB
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['moja_baza']
-    collection = db['ustawy']
+    print(f"Found {len(pdf_files)} PDF files.")
+
+    # Connect to MongoDB
+    client = MongoClient('mongodb://mongo:27017/')  # Use container name for MongoDB
+    db = client['legal_database']
+    collection = db['laws']
 
     for pdf_path in pdf_files:
-        print(f"Przetwarzanie pliku: {pdf_path}")
+        print(f"Processing file: {pdf_path}")
         text = extract_text_from_pdf(pdf_path)
 
-        # Korekta tekstu
+        # Correct text
         corrected_text = correct_text(text)
 
-        # keywords = extract_keywords(corrected_text)
+        # Classify legal field
         legal_field = classify_legal_field(corrected_text)
 
-        # Wybierz jedną z funkcji zapisu:
-        # save_to_mongodb(collection, pdf_path, keywords)
-        # lub
+        # Save to MongoDB
         save_to_mongodb_binary(collection, pdf_path, legal_field)
 
 

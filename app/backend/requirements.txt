@@ -1,11 +1,7 @@
 fastapi~=0.115.4
 uvicorn[standard]
 pymongo~=4.10.1
-python-multipart
 pdfminer.six
-scikit-learn
-nltk
-tqdm
 pytest
 httpx
 vertexai
@@ -13,11 +9,8 @@ google-cloud-storage
 google-cloud-aiplatform
 requests~=2.32.3
 pymupdf==1.24.14
-keybert~=0.8.5
 pydantic~=2.9.2
 python-dotenv~=1.0.1
-pytest~=8.3.3
 beautifulsoup4~=4.12.3
-Unidecode~=1.3.8
 cleantext~=1.1.4
 language_tool_python
