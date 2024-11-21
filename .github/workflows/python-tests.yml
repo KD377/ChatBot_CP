@@ -29,10 +29,10 @@ jobs:
         python -m venv venv  # Create a virtual environment
         . venv/bin/activate  # Activate the virtual environment
         pip install --upgrade pip  # Upgrade pip
-        pip install -r requirements.txt  # Install dependencies from your requirements file
+        pip install -r app/backend/requirements.txt  # Install dependencies from your requirements file
 
     - name: Run tests
       run: |
         . venv/bin/activate
         pip install pytest httpx vertexai
-        pytest APITest.py --maxfail=1 
+        pytest app/backend/tests/APITest.py --maxfail=1 
