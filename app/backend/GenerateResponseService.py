@@ -1,6 +1,6 @@
 import vertexai
 from vertexai.generative_models import GenerativeModel
-from ExtendedContextMatcherService import ExtendedContextMatcherService
+from .ExtendedContextMatcherService import ExtendedContextMatcherService
 
 
 class LanguageModelService:
@@ -8,7 +8,7 @@ class LanguageModelService:
         vertexai.init(project="gentle-cable-441612-q2", location="europe-central2")
         self.model = GenerativeModel("gemini-1.5-flash-002")
 
-        self.law_domains = self._read_law_domains("law_domains.txt")
+        self.law_domains = self._read_law_domains("backend/law_domains.txt")
 
         self.context_matcher = ExtendedContextMatcherService()
 

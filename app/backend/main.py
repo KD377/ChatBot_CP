@@ -4,7 +4,7 @@ from pydantic import BaseModel, StrictInt
 from typing import List, Optional
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-from GenerateResponseService import LanguageModelService
+from .GenerateResponseService import LanguageModelService
 
 # Load environment variables
 load_dotenv()

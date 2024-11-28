@@ -1,5 +1,5 @@
-from ContextMatcherService import ContextMatcherService
-from MongoDBHandler import MongoDBHandler
+from .ContextMatcherService import ContextMatcherService
+from .MongoDBHandler import MongoDBHandler
 
 
 class ExtendedContextMatcherService(MongoDBHandler, ContextMatcherService):

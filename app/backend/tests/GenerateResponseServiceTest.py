@@ -1,20 +1,19 @@
 import sys
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, mock_open
-from ..ExtendedContextMatcherService import ExtendedContextMatcherService
 
 sys.modules['ExtendedContextMatcherService'] = Mock()
 
 from ..GenerateResponseService import LanguageModelService
 
-class TestLanguageModelService:
 
+class TestLanguageModelService:
 
     @patch('app.backend.GenerateResponseService.LanguageModelService._read_law_domains',
            return_value=['prawo cywilne', 'prawo dupy', 'prawo ulicy'])
     @patch('app.backend.GenerateResponseService.GenerativeModel.generate_content')
     def test_match_law_domain_valid(self, mock_generate_content, mock_read_law_domains):
-
         mock_response = Mock()
         mock_response.text = 'prawo cywilne'
 
@@ -31,7 +30,6 @@ class TestLanguageModelService:
            return_value=['prawo cywilne', 'prawo karne', 'prawo rodzinne'])
     @patch('app.backend.GenerateResponseService.GenerativeModel.generate_content')
     def test_match_law_domain_invalid(self, mock_generate_content, mock_read_law_domains):
-
         mock_response = Mock()
         mock_response.text = 'invalid law'
 
@@ -43,4 +41,3 @@ class TestLanguageModelService:
             service._match_law_domain('co grozi za nie płacenie podatku VAT')
 
         assert 'Model returned an invalid law domain: invalid law' in str(excinfo.value)
-
