@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-from main import app
+from app.backend.main import app
 
 client = TestClient(app)
 
@@ -11,7 +11,7 @@ def setup_and_teardown():
     yield
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_valid_question(mock_get_model_response):
     mock_get_model_response.return_value = "Próbna odpowiedź na potrzeby testów"
 
@@ -24,7 +24,7 @@ def test_valid_question(mock_get_model_response):
     mock_get_model_response.assert_called_once_with(question)
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_valid_question_without_sense(mock_get_model_response):
     mock_get_model_response.return_value = "Próbna odpowiedź na potrzeby testów"
 
@@ -37,7 +37,7 @@ def test_valid_question_without_sense(mock_get_model_response):
     mock_get_model_response.assert_called_once_with(question)
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_empty_string_question_provided(mock_get_model_response):
     response = client.post("/ask", json={"question": ""})
 
@@ -47,7 +47,7 @@ def test_empty_string_question_provided(mock_get_model_response):
     mock_get_model_response.assert_not_called()
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_unprocessable_entity(mock_get_model_response):
     response = client.post("/ask", json={"differentElement": ""})
 
@@ -56,7 +56,7 @@ def test_unprocessable_entity(mock_get_model_response):
     assert response.json() is not None
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_question_is_not_of_type_str(mock_get_model_response):
     response = client.post("/ask", json={"question": 2000})
 
@@ -65,17 +65,17 @@ def test_question_is_not_of_type_str(mock_get_model_response):
     assert response.json() is not None
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_question_is_too_long(mock_get_model_response):
     long_question = "A" * 2001
     response = client.post("/ask", json={"question": long_question})
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Zbyt długie pytanie"
+    assert response.json()["detail"] == "Zbyt długie pytanie."
     mock_get_model_response.assert_not_called()
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_ask_question_no_answer(mock_get_model_response):
     mock_get_model_response.return_value = None
 
@@ -87,7 +87,7 @@ def test_ask_question_no_answer(mock_get_model_response):
     mock_get_model_response.assert_called_once_with(question)
 
 
-@patch('main.LanguageModelService.get_model_response')
+@patch('app.backend.main.LanguageModelService.get_model_response')
 def test_ask_question_internal_server_error(mock_get_model_response):
     mock_get_model_response.side_effect = Exception("Simulated internal error")
 
